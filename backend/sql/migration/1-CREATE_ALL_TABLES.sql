@@ -1,15 +1,67 @@
+-- Table: public.user_role
+
+-- DROP TABLE IF EXISTS public.user_role;
+
+CREATE TABLE IF NOT EXISTS public.user_role
+(
+    iid smallint NOT NULL,
+    title character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    create_incident boolean,
+    direct_incident boolean,
+    create_alteration boolean,
+    create_task boolean DEFAULT false,
+    create_order boolean DEFAULT false,
+    create_appeal boolean DEFAULT true,
+    CONSTRAINT user_role_pkey PRIMARY KEY (iid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.user_role
+    OWNER to postgres;
+
+
+-- Table: public.portal_user
+
+-- DROP TABLE IF EXISTS public.portal_user;
+
+CREATE TABLE IF NOT EXISTS public.portal_user
+(
+    iid SERIAL PRIMARY KEY,
+    ad_login text COLLATE pg_catalog."default" NOT NULL,
+    ad_name text COLLATE pg_catalog."default" NOT NULL,
+    ad_email text COLLATE pg_catalog."default" NOT NULL,
+    additional_email text COLLATE pg_catalog."default",
+    mobile_phone text COLLATE pg_catalog."default" NOT NULL,
+    --CONSTRAINT portal_role FOREIGN KEY (portal_role)
+	portal_role smallint NOT NULL DEFAULT 1,
+	FOREIGN KEY (portal_role)
+        REFERENCES public.user_role (iid)
+	--CONSTRAINT portal_user_pkey PRIMARY KEY (iid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.portal_user
+    OWNER to postgres;
+
+COMMENT ON TABLE public.portal_user
+    IS 'Пользователи портала';
+
+
+
 -- Table: public.alteration
 
 -- DROP TABLE IF EXISTS public.alteration;
 
 CREATE TABLE IF NOT EXISTS public.alteration
 (
-    iid bigint NOT NULL DEFAULT nextval('alteration_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     iid_user bigint NOT NULL,
     title text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     iid_executor bigint NOT NULL,
-    CONSTRAINT alteration_pkey PRIMARY KEY (iid),
+    --CONSTRAINT alteration_pkey PRIMARY KEY (iid),
     CONSTRAINT iid_executor FOREIGN KEY (iid)
         REFERENCES public.portal_user (iid) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -35,12 +87,12 @@ COMMENT ON TABLE public.alteration
 
 CREATE TABLE IF NOT EXISTS public.appeal
 (
-    iid bigint NOT NULL DEFAULT nextval('appeal_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     iid_user bigint NOT NULL DEFAULT '-1'::integer,
     title text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     iid_executor bigint NOT NULL,
-    CONSTRAINT appeal_pkey PRIMARY KEY (iid),
+    --CONSTRAINT appeal_pkey PRIMARY KEY (iid),
     CONSTRAINT iid_executer FOREIGN KEY (iid_executor)
         REFERENCES public.portal_user (iid) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -66,10 +118,10 @@ COMMENT ON TABLE public.appeal
 
 CREATE TABLE IF NOT EXISTS public.incident
 (
-    iid bigint NOT NULL DEFAULT nextval('incident_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     title text COLLATE pg_catalog."default" NOT NULL,
-    description text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT incident_pkey PRIMARY KEY (iid)
+    description text COLLATE pg_catalog."default" NOT NULL
+    --CONSTRAINT incident_pkey PRIMARY KEY (iid)
 )
 
 TABLESPACE pg_default;
@@ -87,12 +139,12 @@ COMMENT ON TABLE public.incident
 
 CREATE TABLE IF NOT EXISTS public."order"
 (
-    iid bigint NOT NULL DEFAULT nextval('order_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     iid_user bigint NOT NULL,
     title text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     iid_executor bigint NOT NULL,
-    CONSTRAINT order_pkey PRIMARY KEY (iid),
+    --CONSTRAINT order_pkey PRIMARY KEY (iid),
     CONSTRAINT iid_executor FOREIGN KEY (iid)
         REFERENCES public.portal_user (iid) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -112,46 +164,17 @@ COMMENT ON TABLE public."order"
     IS 'Заказ : специально для кадровых или иных служб, работающих с предметами, существующими в реале - заказ документов, справок, канцелярии и тд. Создается ответственными пользователями, должность или подразделение которых соответствует условию в системе';
 
 
--- Table: public.portal_user
-
--- DROP TABLE IF EXISTS public.portal_user;
-
-CREATE TABLE IF NOT EXISTS public.portal_user
-(
-    iid bigint NOT NULL DEFAULT nextval('portal_user_iid_seq'::regclass),
-    ad_login text COLLATE pg_catalog."default" NOT NULL,
-    ad_name text COLLATE pg_catalog."default" NOT NULL,
-    ad_email text COLLATE pg_catalog."default" NOT NULL,
-    additional_email text COLLATE pg_catalog."default",
-    portal_role smallint NOT NULL DEFAULT 1,
-    mobile_phone text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT portal_user_pkey PRIMARY KEY (iid),
-    CONSTRAINT portal_role FOREIGN KEY (portal_role)
-        REFERENCES public.user_role (iid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.portal_user
-    OWNER to postgres;
-
-COMMENT ON TABLE public.portal_user
-    IS 'Пользователи портала';
-
-
 -- Table: public.product
 
 -- DROP TABLE IF EXISTS public.product;
 
 CREATE TABLE IF NOT EXISTS public.product
 (
-    iid bigint NOT NULL DEFAULT nextval('product_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     short_title text COLLATE pg_catalog."default" NOT NULL,
     long_title text COLLATE pg_catalog."default",
-    iid_manager bigint NOT NULL,
-    CONSTRAINT iid PRIMARY KEY (iid)
+    iid_manager bigint NOT NULL
+    --CONSTRAINT iid PRIMARY KEY (iid)
 )
 
 TABLESPACE pg_default;
@@ -168,12 +191,12 @@ COMMENT ON TABLE public.product
 
 CREATE TABLE IF NOT EXISTS public.task
 (
-    iid bigint NOT NULL DEFAULT nextval('task_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     iid_user bigint NOT NULL,
     title text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     iid_executor bigint NOT NULL,
-    CONSTRAINT task_pkey PRIMARY KEY (iid),
+    --CONSTRAINT task_pkey PRIMARY KEY (iid),
     CONSTRAINT iid_executor FOREIGN KEY (iid)
         REFERENCES public.portal_user (iid) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -192,40 +215,18 @@ ALTER TABLE IF EXISTS public.task
 COMMENT ON TABLE public.task
     IS 'Задача : вариант инцидента, не требующий получения обратной связи от пользователя. Создается автоматически Роботом или Администратором';
 
--- Table: public.user_role
-
--- DROP TABLE IF EXISTS public.user_role;
-
-CREATE TABLE IF NOT EXISTS public.user_role
-(
-    iid smallint NOT NULL,
-    title character varying(20) COLLATE pg_catalog."default" NOT NULL,
-    create_incident boolean,
-    direct_incident boolean,
-    create_alteration boolean,
-    create_task boolean DEFAULT false,
-    create_order boolean DEFAULT false,
-    create_appeal boolean DEFAULT true,
-    CONSTRAINT user_role_pkey PRIMARY KEY (iid)
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.user_role
-    OWNER to postgres;
-
 -- Table: public.workgroup
 
 -- DROP TABLE IF EXISTS public.workgroup;
 
 CREATE TABLE IF NOT EXISTS public.workgroup
 (
-    iid bigint NOT NULL DEFAULT nextval('workgroup_iid_seq'::regclass),
+    iid SERIAL PRIMARY KEY,
     short_title text COLLATE pg_catalog."default" NOT NULL,
     long_title text COLLATE pg_catalog."default",
     location text COLLATE pg_catalog."default" NOT NULL,
     iid_manager bigint NOT NULL,
-    CONSTRAINT workgroup_pkey PRIMARY KEY (iid),
+    --CONSTRAINT workgroup_pkey PRIMARY KEY (iid),
     CONSTRAINT iid_manager FOREIGN KEY (iid_manager)
         REFERENCES public.portal_user (iid) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -357,10 +358,10 @@ COMMENT ON TABLE public.workgroup_to_product
 INSERT INTO public.user_role(
 	iid, title, create_incident, direct_incident, create_alteration, create_task, create_order, create_appeal)
 	VALUES 
-(0,"Administrator",TRUE,TRUE,TRUE,TRUE,TRUE,TRUE),
-(1,"User",FALSE,FALSE,FALSE,FALSE,FALSE,TRUE),
-(2,"Executor",TRUE,FALSE,FALSE,FALSE,FALSE,TRUE),
-(3,"Coordinator",TRUE,TRUE,FALSE,FALSE,FALSE,TRUE),
-(4,"Developer",TRUE,FALSE,TRUE,FALSE,FALSE,TRUE),
-(5,"Product Manager",TRUE,TRUE,TRUE,FALSE,FALSE,TRUE),
-(6,"Robot",FALSE,FALSE,FALSE,TRUE,FALSE,FALSE);
+(0,'Administrator',TRUE,TRUE,TRUE,TRUE,TRUE,TRUE),
+(1,'User',FALSE,FALSE,FALSE,FALSE,FALSE,TRUE),
+(2,'Executor',TRUE,FALSE,FALSE,FALSE,FALSE,TRUE),
+(3,'Coordinator',TRUE,TRUE,FALSE,FALSE,FALSE,TRUE),
+(4,'Developer',TRUE,FALSE,TRUE,FALSE,FALSE,TRUE),
+(5,'Product Manager',TRUE,TRUE,TRUE,FALSE,FALSE,TRUE),
+(6,'Robot',FALSE,FALSE,FALSE,TRUE,FALSE,FALSE);
