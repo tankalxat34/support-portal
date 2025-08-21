@@ -40,8 +40,14 @@ async def get_user(
     """
     Возвращает пользователя по его `iid`.
     """
+    # result = await db.execute(select(models.PortalUser).where(models.PortalUser.iid == user_id))
+    # user = result.scalar_one_or_none()
+
     result = await db.execute(select(models.PortalUser).where(models.PortalUser.iid == user_id))
     user = result.scalar_one_or_none()
+
+    role_dict = await db.execute(select(models.UserRole).where(models.UserRole.iid == user.portal_role))
+    role_dict_result = role_dict.scalar_one_or_none()
 
     if not user:
         raise HTTPException(
@@ -49,13 +55,15 @@ async def get_user(
             detail=f"Пользователь с ID={user_id} не найден"
         )
 
+    # user["role"] = role_dict_result
+
     return user
 
 @router.get("/{user_id}/appeals", summary="Получить все обращения пользователя на портале")
 async def get_user(
     user_id: int,
     db: AsyncSession = Depends(get_db)
-) -> List[schemas.AppealSchema]:
+) -> schemas.API_AppealSchema:
     """
     Получить все обращения пользователя на портале
     """
@@ -67,7 +75,31 @@ async def get_user(
     if not appeals:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Пользователь с ID={user_id} не найден"
+            detail=f"Нет обращений"
         )
 
-    return [appeals]
+    return {
+        "appeals": appeals
+    }
+
+@router.get("/{user_id}/workgroups", summary="Рабочие группы, в которых состоит пользователь")
+async def get_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db)
+# ) -> List[int]:
+) -> schemas.API_UserWorkgroups:
+    """
+    Рабочие группы, в которых состоит пользователь
+    """
+    result = await db.execute(select(models.user_to_workgroup).where(models.user_to_workgroup.columns.get("iid_user") == user_id))
+    r = result.scalars().all()
+
+    if not r:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Пользователь не состоит в рабочих группах"
+        )
+
+    return {
+            "workgroups": r
+        }

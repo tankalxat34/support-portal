@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 # —————————————————————————————
 # 1. user_role
@@ -49,7 +49,7 @@ class PortalUserBase(BaseModel):
     ad_email: str
     additional_email: Optional[str] = None
     mobile_phone: str
-    portal_role: int = 1
+    portal_role: int
     # workgroups: List["WorkgroupSchema"] = [] 
 
 class PortalUserCreate(PortalUserBase):
@@ -69,6 +69,8 @@ class PortalUserSchema(PortalUserBase):
     class Config:
         from_attributes = True
 
+class API_PortalUser(PortalUserSchema):
+    pass
 
 # —————————————————————————————
 # 3. alteration (изменение)
@@ -106,7 +108,7 @@ class AppealBase(BaseModel):
     title: str
     description: str
     iid_user: int
-    iid_executor: int
+    iid_executor: int | None = None
 
 class AppealCreate(AppealBase):
     pass
@@ -114,18 +116,20 @@ class AppealCreate(AppealBase):
 class AppealUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    iid_executor: Optional[int] = None
+    iid_executor: Optional[int] = -1
 
 class AppealSchema(AppealBase):
     iid: int
     creator: Optional[PortalUserSchema] = None
     executor: Optional[PortalUserSchema] = None
-    incidents: List["IncidentSchema"] = []
+    incidents: Optional["IncidentSchema"] = None
 
     class Config:
         from_attributes = True
 
-# class AppealSchema_
+
+class API_AppealSchema(BaseModel):
+    appeals: List[AppealBase] = None
 
 # —————————————————————————————
 # 5. incident (инцидент)
@@ -327,7 +331,8 @@ class WorkgroupToProductSchema(WorkgroupToProductBase):
     class Config:
         from_attributes = True
 
-
+class API_UserWorkgroups(BaseModel):
+    workgroups: List[int]
 ###
 
 # PortalUserSchema.model_rebuild()
