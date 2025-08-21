@@ -40,8 +40,6 @@ async def get_user(
     """
     Возвращает пользователя по его `iid`.
     """
-    # result = await db.execute(select(models.PortalUser).where(models.PortalUser.iid == user_id))
-    # user = result.scalar_one_or_none()
 
     result = await db.execute(select(models.PortalUser).where(models.PortalUser.iid == user_id))
     user = result.scalar_one_or_none()

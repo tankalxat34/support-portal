@@ -38,6 +38,8 @@ class UserRoleSchema(UserRoleBase):
     class Config:
         from_attributes = True
 
+class API_UserRoleList(BaseModel):
+    roles: List[UserRoleSchema]
 
 # —————————————————————————————
 # 2. portal_user
@@ -105,6 +107,7 @@ class AlterationSchema(AlterationBase):
 # —————————————————————————————
 class AppealBase(BaseModel):
     """Обращение"""
+    iid: int
     title: str
     description: str
     iid_user: int

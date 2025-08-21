@@ -17,26 +17,45 @@ router = APIRouter(
 # /roles
 
 @router.get("/", summary="Получить все роли, доступные на портале")
-async def get_user(
+async def get_roles(
     db: AsyncSession = Depends(get_db)
-) -> List[schemas.UserRoleSchema]:
+) -> schemas.API_UserRoleList:
     """
     Получить все роли, доступные на портале
     """
     role_dict = await db.execute(select(models.UserRole))
-    role_dict_result = role_dict.scalars()
+    role_dict_result = role_dict.scalars().all()
 
     if not role_dict_result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND
         )
 
-    return [role_dict_result]
+    return {"roles": role_dict_result}
 
 # /role
 
+@router.get("/{role_id}", summary="Получить информацию о роли")
+async def get_role(
+    role_id: int,
+    db: AsyncSession = Depends(get_db)
+) -> schemas.UserRoleSchema:
+    """
+    Получить информацию о роли
+    """
+    role_dict = await db.execute(select(models.UserRole).where(models.UserRole.iid == role_id))
+    role_dict_result = role_dict.scalar_one_or_none()
+
+    if not role_dict_result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Роль с id == {role_id} не существует"
+        )
+
+    return role_dict_result
+
 @router.get("/roleByUserID/{user_id}", summary="Получить роль по ID пользователя")
-async def get_user(
+async def roleByUserID(
     user_id: int,
     db: AsyncSession = Depends(get_db)
 ) -> schemas.UserRoleSchema:
