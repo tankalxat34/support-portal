@@ -4,3 +4,4 @@ API version 1
 """
 
 from .users import router as users_router
+from .roles import router as roles_router

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import List, Literal
 from fastapi import APIRouter, FastAPI, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +13,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
+# main node
 
 @router.get("/", summary="Получить список пользователей")
 async def get_users(
@@ -29,6 +30,7 @@ async def get_users(
     users = result.scalars().all()
     return users
 
+# /user
 
 @router.get("/{user_id}", summary="Получить пользователя по ID")
 async def get_user(
@@ -41,10 +43,6 @@ async def get_user(
     result = await db.execute(select(models.PortalUser).where(models.PortalUser.iid == user_id))
     user = result.scalar_one_or_none()
 
-    # additional = None
-    # additional = await db.execute(select(model.))
-
-
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -52,3 +50,24 @@ async def get_user(
         )
 
     return user
+
+@router.get("/{user_id}/appeals", summary="Получить все обращения пользователя на портале")
+async def get_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db)
+) -> List[schemas.AppealSchema]:
+    """
+    Получить все обращения пользователя на портале
+    """
+    result = await db.execute(select(models.Appeal).where(models.Appeal.iid_user == user_id))
+    appeals = result.scalars().all()
+
+    print(appeals)
+
+    if not appeals:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Пользователь с ID={user_id} не найден"
+        )
+
+    return [appeals]

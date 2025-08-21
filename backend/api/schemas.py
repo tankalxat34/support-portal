@@ -105,7 +105,7 @@ class AppealBase(BaseModel):
     """Обращение"""
     title: str
     description: str
-    iid_user: int = -1
+    iid_user: int
     iid_executor: int
 
 class AppealCreate(AppealBase):
@@ -125,6 +125,7 @@ class AppealSchema(AppealBase):
     class Config:
         from_attributes = True
 
+# class AppealSchema_
 
 # —————————————————————————————
 # 5. incident (инцидент)

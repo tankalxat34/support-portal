@@ -21,6 +21,7 @@ async def init_tables():
 
 
 app.include_router(v1.users_router)
+app.include_router(v1.roles_router)
 
 @app.get("/async")
 async def async_endpoint():

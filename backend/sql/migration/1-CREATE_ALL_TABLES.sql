@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS public.appeal
     iid_user bigint NOT NULL DEFAULT '-1'::integer,
     title text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
-    iid_executor bigint NOT NULL,
+    iid_executor bigint,
     --CONSTRAINT appeal_pkey PRIMARY KEY (iid),
     CONSTRAINT iid_executer FOREIGN KEY (iid_executor)
         REFERENCES public.portal_user (iid) MATCH SIMPLE
