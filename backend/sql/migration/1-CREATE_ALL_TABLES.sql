@@ -25,6 +25,33 @@ ALTER TABLE IF EXISTS public.user_role
 
 -- DROP TABLE IF EXISTS public.portal_user;
 
+-- CREATE TABLE IF NOT EXISTS public.portal_user
+-- (
+--     iid SERIAL PRIMARY KEY,
+--     ad_login text COLLATE pg_catalog."default" NOT NULL,
+--     ad_name text COLLATE pg_catalog."default" NOT NULL,
+--     ad_email text COLLATE pg_catalog."default" NOT NULL,
+--     additional_email text COLLATE pg_catalog."default",
+--     mobile_phone text COLLATE pg_catalog."default" NOT NULL,
+--     --CONSTRAINT portal_role FOREIGN KEY (portal_role)
+-- 	portal_role smallint NOT NULL DEFAULT 1,
+-- 	FOREIGN KEY (portal_role)
+--         REFERENCES public.user_role (iid)
+-- 	--CONSTRAINT portal_user_pkey PRIMARY KEY (iid)
+-- )
+
+-- TABLESPACE pg_default;
+
+-- ALTER TABLE IF EXISTS public.portal_user
+--     OWNER to postgres;
+
+-- COMMENT ON TABLE public.portal_user
+--     IS 'Пользователи портала';
+
+-- Table: public.portal_user
+
+-- DROP TABLE IF EXISTS public.portal_user;
+
 CREATE TABLE IF NOT EXISTS public.portal_user
 (
     iid SERIAL PRIMARY KEY,
@@ -33,11 +60,12 @@ CREATE TABLE IF NOT EXISTS public.portal_user
     ad_email text COLLATE pg_catalog."default" NOT NULL,
     additional_email text COLLATE pg_catalog."default",
     mobile_phone text COLLATE pg_catalog."default" NOT NULL,
-    --CONSTRAINT portal_role FOREIGN KEY (portal_role)
-	portal_role smallint NOT NULL DEFAULT 1,
-	FOREIGN KEY (portal_role)
-        REFERENCES public.user_role (iid)
-	--CONSTRAINT portal_user_pkey PRIMARY KEY (iid)
+    portal_role smallint NOT NULL DEFAULT 1,
+    CONSTRAINT portal_user_pkey PRIMARY KEY (iid),
+    CONSTRAINT portal_user_portal_role_fkey FOREIGN KEY (portal_role)
+        REFERENCES public.user_role (iid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
 )
 
 TABLESPACE pg_default;
@@ -47,8 +75,6 @@ ALTER TABLE IF EXISTS public.portal_user
 
 COMMENT ON TABLE public.portal_user
     IS 'Пользователи портала';
-
-
 
 -- Table: public.alteration
 

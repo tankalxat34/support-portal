@@ -1,3 +1,4 @@
+from typing import Literal
 from fastapi import APIRouter, FastAPI, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,15 +27,23 @@ async def get_users(
         select(models.PortalUser).offset(skip).limit(limit)
     )
     users = result.scalars().all()
-    return {"users": users}
+    return users
+
 
 @router.get("/{user_id}", summary="Получить пользователя по ID")
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def get_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db)
+) -> schemas.PortalUserSchema:
     """
     Возвращает пользователя по его `iid`.
     """
     result = await db.execute(select(models.PortalUser).where(models.PortalUser.iid == user_id))
     user = result.scalar_one_or_none()
+
+    # additional = None
+    # additional = await db.execute(select(model.))
+
 
     if not user:
         raise HTTPException(
@@ -42,4 +51,4 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
             detail=f"Пользователь с ID={user_id} не найден"
         )
 
-    return {"user": user}
+    return user

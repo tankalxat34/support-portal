@@ -50,6 +50,7 @@ class PortalUserBase(BaseModel):
     additional_email: Optional[str] = None
     mobile_phone: str
     portal_role: int = 1
+    # workgroups: List["WorkgroupSchema"] = [] 
 
 class PortalUserCreate(PortalUserBase):
     pass
@@ -62,9 +63,8 @@ class PortalUserUpdate(BaseModel):
 
 class PortalUserSchema(PortalUserBase):
     iid: int
-    role: Optional[UserRoleSchema] = None  # связь
-    workroups: List[Any] = None
-    appeals: List[Any] = None
+    # role: Optional[UserRoleSchema] = None  # связь
+    # workgroups: Optional["WorkgroupSchema"] = [] 
 
     class Config:
         from_attributes = True
@@ -325,3 +325,9 @@ class WorkgroupToProductSchema(WorkgroupToProductBase):
 
     class Config:
         from_attributes = True
+
+
+###
+
+# PortalUserSchema.model_rebuild()
+# WorkgroupSchema.model_rebuild()
